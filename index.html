@@ -3,7 +3,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>WiiU/C++ NBT Builder </title>
+<title>WiiU NBT Builder</title>
 
 <style>
 body{font-family:sans-serif;background:#f5fbff;margin:20px}
@@ -21,7 +21,7 @@ textarea{width:100%;height:200px}
 
 <body>
 
-<!-- <h1>WiiU用 NBT簡易作成ツール</h1> -->
+<h1>WiiU用 NBT簡易作成ツール</h1>
 
 <div class="card">
 <label><input type="radio" name="mode" value="menu" checked> クリエイティブメニュー</label>
@@ -57,23 +57,39 @@ textarea{width:100%;height:200px}
 /* ===================== 定数 ===================== */
 
 const enchantList=[
- ['Enchantments_Protection','防護'],['Enchantments_FireProtection','防火'],
- ['Enchantments_FeatherFalling','落下軽減'],['Enchantments_BlastProtection','爆発耐性'],
- ['Enchantments_ProjectileProtection','間接攻撃耐性'],['Enchantments_Respiration','水中呼吸'],
- ['Enchantments_AquaAffinity','水中作業'],['Enchantments_Thorns','とげ'],
- ['Enchantments_DepthStrider','水中移動'],['Enchantments_FrostWalker','氷渡り'],
- ['Enchantments_Curse_of_Binding','束縛の呪い'],['Enchantments_Sharpness','鋭さ'],
- ['Enchantments_Smite','聖なる力'],['Enchantments_Bane_of_Arthropods','虫殺し'],
- ['Enchantments_Knockback','ノックバック'],['Enchantments_FireAspect','火属性'],
- ['Enchantments_Looting','アイテムボーナス'],['Enchantments_Efficiency','効率'],
- ['Enchantments_SilkTouch','シルクタッチ'],['Enchantments_Unbreaking','耐久力'],
- ['Enchantments_Fortune','幸運'],['Enchantments_Power','射撃ダメージ'],
- ['Enchantments_Punch','衝撃'],['Enchantments_Flame','火炎'],
- ['Enchantments_Infinity','無限'],['Enchantments_Luck_of_the_Sea','宝釣り'],
- ['Enchantments_Lure','入れ食い'],['Enchantments_Mending','修繕'],
+ ['Enchantments_Protection','防護'],
+ ['Enchantments_FireProtection','防火'],
+ ['Enchantments_FeatherFalling','落下軽減'],
+ ['Enchantments_BlastProtection','爆発耐性'],
+ ['Enchantments_ProjectileProtection','間接攻撃耐性'],
+ ['Enchantments_Respiration','水中呼吸'],
+ ['Enchantments_AquaAffinity','水中作業'],
+ ['Enchantments_Thorns','とげ'],
+ ['Enchantments_DepthStrider','水中移動'],
+ ['Enchantments_FrostWalker','氷渡り'],
+ ['Enchantments_Curse_of_Binding','束縛の呪い'],
+ ['Enchantments_Sharpness','鋭さ'],
+ ['Enchantments_Smite','聖なる力'],
+ ['Enchantments_Bane_of_Arthropods','虫殺し'],
+ ['Enchantments_Knockback','ノックバック'],
+ ['Enchantments_FireAspect','火属性'],
+ ['Enchantments_Looting','アイテムボーナス'],
+ ['Enchantments_Efficiency','効率'],
+ ['Enchantments_SilkTouch','シルクタッチ'],
+ ['Enchantments_Unbreaking','耐久力'],
+ ['Enchantments_Fortune','幸運'],
+ ['Enchantments_Power','射撃ダメージ'],
+ ['Enchantments_Punch','衝撃'],
+ ['Enchantments_Flame','火炎'],
+ ['Enchantments_Infinity','無限'],
+ ['Enchantments_Luck_of_the_Sea','宝釣り'],
+ ['Enchantments_Lure','入れ食い'],
+ ['Enchantments_Mending','修繕'],
  ['Enchantments_Curse_of_Vanishing','消滅の呪い'],
- ['Enchantments_Impaling','串刺し'],['Enchantments_Riptide','激流'],
- ['Enchantments_Loyalty','忠誠心'],['Enchantments_Channeling','チャネリング']
+ ['Enchantments_Impaling','串刺し'],
+ ['Enchantments_Riptide','激流'],
+ ['Enchantments_Loyalty','忠誠心'],
+ ['Enchantments_Channeling','チャネリング']
 ];
 
 const attributeList=[
@@ -128,6 +144,10 @@ const opeList=[
  ['Attribute_Operation_Percent','パーセント:1']
 ];
 
+// const amountCategory=[
+//  'Infinity','Neg_Infinity','NaN'
+// ];
+
 /* ===================== データ ===================== */
 
 let items=[];
@@ -136,7 +156,7 @@ let items=[];
 
 function addItem(){
  items.push({
-  pos:1,id:1,count:1,damage:0,
+  pos:0,id:0,count:1,damage:0,
   enchants:[],
   attributes:[]
  });
@@ -250,6 +270,9 @@ function openAttribute(i){
   opeSel.appendChild(op);
  });
 
+ const amount=document.createElement('input');
+ amount.placeholder='例: 0.1 / Infinity, Neg_Infinity, NaN';
+
  const btn=document.createElement('button');
  btn.textContent='追加';
  btn.onclick=()=>{
@@ -273,6 +296,7 @@ function openAttribute(i){
 /* ===================== Attribute Amount Formatter ===================== */
 
 function formatAttributeAmount(v){
+  // 特殊カテゴリはそのまま
   if(v === 'Infinity' || v === 'Neg_Infinity' || v === 'NaN'){
     return v;
   }
@@ -287,6 +311,7 @@ function formatAttributeAmount(v){
     }
   }
 
+  // 想定外入力（保険）
   return v;
 }
 
@@ -310,6 +335,7 @@ function update(){
    out+='ListTag *AttributeModifiers = newListTag();\n';
    it.attributes.forEach((a,i)=>{
     out+=`CompoundTag *ability${i} = newTag();\n`;
+    // out+=`NBT::Status(tag,AttributeModifiers,ability${i},${a.id}, ${a.operation}, ${a.amount}db);\n`;
     const amt = formatAttributeAmount(a.amount);
     out+=`NBT::Status(tag,AttributeModifiers,ability,${a.id}, ${a.operation}, ${amt});\n`;
    });
