@@ -3,7 +3,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<!-- <title>NBT to C++</title> -->
+<!-- <title>WiiU/C++ NBT Builder</title> -->
 
 <style>
 body{font-family:sans-serif;background:#f5fbff;margin:20px}
@@ -21,8 +21,7 @@ textarea{width:100%;height:200px}
 
 <body>
 
-<h1>NBT to C++</h1>
-<!-- <h1>WiiU/C++ NBT Builder</h1> -->
+<h1>WiiU/C++ NBT Builder</h1>
 
 <div class="card">
 <label><input type="radio" name="mode" value="menu" checked> クリエイティブメニュー</label>
@@ -775,10 +774,10 @@ function update(){
     const slotRadio=document.querySelector('input[name="handType"]:checked');
     const slot=slotRadio ? slotRadio.value : "0";
     if(slot === "0"){
-      out+=`HandSummon(tag${itemIndex}, ${it.id}, ${it.count});\n\n`;
+      out+=`HandSummon_Plus(tag${itemIndex}, ${it.pos}, ${it.id}, ${it.count});\n\n`;
     }
     else{
-      out+=`SlotSummon(tag${itemIndex}, ${it.id}, ${it.count});\n\n`;
+      out+=`SlotSummon_Plus(tag${itemIndex}, ${it.pos}, ${it.id}, ${it.count});\n\n`;
     }
   }
 
