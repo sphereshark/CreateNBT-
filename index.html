@@ -231,11 +231,26 @@ function renderLists(it,box){
  it.attributes.forEach((a,i)=>{
   const d=document.createElement('div');
   d.className='ench-row';
-  d.textContent=`${a.id} / ${a.operation} / ${a.amount}`;
+ 
+  let text = `${a.id} / ${a.operation} / ${a.amount}`;
+ 
+  if(a.slot && a.slot !== ""){
+   text += ` / Slot: ${a.slot}`;
+  }
+ 
+  d.textContent = text;
+ 
   const b=document.createElement('button');
-  b.textContent='×';b.className='delete';
-  b.onclick=()=>{it.attributes.splice(i,1);render();update()};
-  d.appendChild(b);el.appendChild(d);
+  b.textContent='×';
+  b.className='delete';
+  b.onclick=()=>{
+   it.attributes.splice(i,1);
+   render();
+   update();
+  };
+ 
+  d.appendChild(b);
+  el.appendChild(d);
  });
 
  it.potions.forEach((p,i)=>{
@@ -427,16 +442,37 @@ function openAttribute(i){
   items[i].attributes.push({
    id:idSel.value,
    operation:opeSel.value,
-   amount:amount.value
+   amount:amount.value,
+   slot:slotSel.value
   });
   render();update();
  };
+
+ const slotSel=document.createElement('select');
+
+ const slotList=[
+  ["","なし"],
+  ["右手","mainhand"],
+  ["左手","offhand"],
+  ["頭","head"],
+  ["服","chest"],
+  ["パンツ","legs"],
+  ["ブーツ","feet"]
+ ];
+ 
+ slotList.forEach(s=>{
+  const o=document.createElement('option');
+  o.value=s[0];
+  o.textContent=s[1];
+  slotSel.appendChild(o);
+ });
 
  w.append(
   'Id ',idSel,
   ' Operation ',opeSel,
   ' Amount ',amount,
   infBtn,negInfBtn,nanBtn,
+  ' Slot ',slotSel,
   btn
  );
 
@@ -659,7 +695,6 @@ function openFlags(i){
    updateTotal();
   };
 
-//   flagWrap.append(name,cb,document.createElement('br'));
 flagWrap.append(cb," ",name,document.createElement('br'));
 
  });
@@ -732,6 +767,9 @@ function update(){
     out+=`CompoundTag *ability${itemIndex}_${i} = newTag();\n`;
     const amt = formatAttributeAmount(a.amount);
     out+=`NBT::Status(tag${itemIndex},AttributeModifiers${itemIndex},ability${itemIndex}_${i},${a.id}, ${a.operation}, ${amt});\n`;
+    if(a.slot && a.slot !== ""){
+     out+=`Slot::${a.slot}(ability${itemIndex}_${i});\n`;
+    }
    });
   }
 
